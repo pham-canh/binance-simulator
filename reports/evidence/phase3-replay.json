@@ -198,7 +198,7 @@
       "event": "audit-chain",
       "records": 11,
       "valid": true,
-      "head": "b046d3c164017cadfc48a0aa6bc10a397b42486ae48c7c072f783d756223702e",
+      "head": "3818c56840cedf7b55c455207fd55dfc8def5f21d585f14747b19dc53334a041",
       "detail": "SHA-256 hash-chained audit records cover every allow/deny decision."
     }
   ],

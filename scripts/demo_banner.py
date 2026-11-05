@@ -21,6 +21,7 @@ END = """
   ------
   56 passed, 14 skipped, 5 xfailed
   10/10 live API checks
+  14 findings fixed, each with a regression test
   rejected withdrawal: 0 broadcasts, balance unchanged
   audit chain: valid
 

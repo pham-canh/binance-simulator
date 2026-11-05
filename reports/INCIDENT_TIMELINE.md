@@ -8,7 +8,10 @@
 - **Seed / clock:** `binance-incident-demo` / `1700000000000`
 
 Every row is labelled. `PUBLIC FACT` rows reproduce the public reporting
-summarised in `PROJECT_ANALYSIS.md`. `SCENARIO` and `CONTROL` rows are
+summarised in `PROJECT_ANALYSIS.md` and were checked on 2026-11-05 against
+the Binance post "29 October 2026 Binance Security Incident: Initial
+Findings and Response Update" (2026-11-03):
+<https://www.binance.com/en/blog/education/3229153443759566763>. `SCENARIO` and `CONTROL` rows are
 synthetic and exist only in this simulator. The replay is an analogue at the
 withdrawal-control boundary, **not** a reproduction of the real intrusion.
 

@@ -4,6 +4,7 @@ Independent educational demo - not Binance.
 RESULT
   56 passed, 14 skipped, 5 xfailed
   10/10 live API checks
+  14 findings fixed (1 blocker, 7 high, 5 medium, 1 low)
   rejected withdrawal: 0 broadcasts, balance unchanged
   audit chain: valid
 

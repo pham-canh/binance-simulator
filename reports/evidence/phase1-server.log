@@ -1,5 +1,5 @@
-2026-11-05 13:57:26,806 -  simulator -    INFO - demo server: mode=simulation redis=fake clock=1700000000000 seed=binance-incident-demo host=127.0.0.1 port=5100 - [run_demo_server.py:62:main]
-2026-11-05 13:57:26,808 -  simulator -    INFO - demo account: X-MBX-APIKEY=demo-user - [run_demo_server.py:66:main]
-2026-11-05 13:57:26,808 -  simulator -    INFO - hot wallet: 956320540153841085873826116828291659258912826898 - [run_demo_server.py:67:main]
+2026-11-05 17:25:56,939 -  simulator -    INFO - demo server: mode=simulation redis=fake clock=1700000000000 seed=binance-incident-demo host=127.0.0.1 port=5100 - [run_demo_server.py:62:main]
+2026-11-05 17:25:56,940 -  simulator -    INFO - demo account: X-MBX-APIKEY=demo-user - [run_demo_server.py:66:main]
+2026-11-05 17:25:56,941 -  simulator -    INFO - hot wallet: 956320540153841085873826116828291659258912826898 - [run_demo_server.py:67:main]
  * Serving Flask app 'binance_api'
  * Debug mode: off

@@ -1,3 +1,3 @@
 ...................................sssssssssssss.............xxxx......x [ 96%]
 s..                                                                      [100%]
-56 passed, 14 skipped, 5 xfailed in 1.82s
+56 passed, 14 skipped, 5 xfailed in 1.04s
