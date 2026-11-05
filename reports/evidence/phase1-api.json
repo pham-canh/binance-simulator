@@ -1,0 +1,62 @@
+{
+  "base": "http://127.0.0.1:5100",
+  "checks": [
+    {
+      "check": "ping",
+      "result": "pong"
+    },
+    {
+      "check": "exchangeInfo",
+      "symbols": 236
+    },
+    {
+      "check": "account",
+      "canWithdraw": true,
+      "assets": 13,
+      "OMG_free": "1000.0"
+    },
+    {
+      "check": "depth",
+      "asks": [
+        [
+          "0.003",
+          "1000",
+          []
+        ]
+      ],
+      "bids": [
+        [
+          "0.003",
+          "1000",
+          []
+        ]
+      ]
+    },
+    {
+      "check": "place_resting_order",
+      "orderId": 1811981318
+    },
+    {
+      "check": "open_orders",
+      "count": 1
+    },
+    {
+      "check": "cancel_order",
+      "orderId": 1811981318
+    },
+    {
+      "check": "marketable_order",
+      "orderId": 1812017665
+    },
+    {
+      "check": "withdraw",
+      "id": "08bbaf0b-bad8-41e4-92e3-2410272e217b"
+    },
+    {
+      "check": "withdraw_history",
+      "count": 1,
+      "txId": "0xc9d773742dd7033c7c1b88f5bebff8852112206b7f4803e8f4563a1708732e48"
+    }
+  ],
+  "status": "ok"
+}

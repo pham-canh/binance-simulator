@@ -1,9 +1,11 @@
 from functools import wraps
+import os
 import traceback
 
 from flask import Flask, request, jsonify
 
-from simulator import config, utils
+from simulator import config, utils, security, web3_interface
+from simulator.dashboard import DISPLAY_NAME, DISCLAIMER, render_dashboard
 from simulator.order_handler import CoreOrder, SimulationOrder
 from simulator.balance_handler import BalanceHandler
 from simulator.exchange import Binance
@@ -24,11 +26,30 @@ MISSING_ERROR = {
     }
 }
 
+# Synthetic tenants. These are not Binance keys and are never sent anywhere.
+ALLOWED_API_KEYS = {
+    key.strip().lower()
+    for key in os.environ.get(
+        'SIMULATOR_API_KEYS', 'demo-user,ops-demo,api_key'
+    ).split(',')
+    if key.strip()
+}
+
+
+def _missing(name):
+    if name in MISSING_ERROR:
+        return MISSING_ERROR[name]
+    return {
+        'code': -1102,
+        'msg': "Mandatory parameter '{}' was not sent, "
+               "was empty/null, or malformed.".format(name)
+    }
+
 
 def validate_params(expected_params):
     for p in expected_params:
         if not request.args.get(p):
-            return MISSING_ERROR['symbol']
+            return _missing(p)
 
 
 def action(expected_params=[], public=False):
@@ -43,7 +64,7 @@ def action(expected_params=[], public=False):
             logger.debug('Original params: {}'.format(params))
             if not public:
                 api_key = request.headers.get('X-MBX-APIKEY')
-                if not api_key:
+                if not api_key or api_key.lower() not in ALLOWED_API_KEYS:
                     return str(MISSING_ERROR['api_key'])
                 else:
                     params['api_key'] = api_key.lower()
@@ -114,7 +135,7 @@ def cancel_order(params):
 
 
 @api.route('/wapi/v3/withdraw.html', methods=['POST'])
-@action(public=False)
+@action(expected_params=['asset', 'amount', 'address'], public=False)
 def withdraw(params):
     return binance.withdraw_api(**params)
 
@@ -134,6 +155,29 @@ def deposit_history(params):
 @api.route('/ping')
 def ping():
     return 'pong'
+
+
+@api.route('/')
+def dashboard():
+    return render_dashboard()
+
+
+@api.route('/api/v1/simulator/status', methods=['GET'])
+def simulator_status():
+    guard = security.get_guard()
+    chain = web3_interface.transaction_snapshot()
+    return jsonify({
+        'display_name': DISPLAY_NAME,
+        'disclaimer': DISCLAIMER,
+        'synthetic': True,
+        'guard': guard.snapshot(),
+        'chain': {
+            'seed': chain['seed'],
+            'broadcasts': len(chain['broadcasts']),
+            'transactions': chain['transaction_count'],
+            'hot_wallet_buckets': len(chain['hot_wallet']),
+        },
+    })
 
 
 rdb = utils.get_redis_db()
@@ -159,4 +203,4 @@ binance = Binance(
 
 if __name__ == '__main__':
     logger.info("Running in {} mode".format(config.MODE))
-    api.run(host='0.0.0.0', port=5100, debug=True)
+    api.run(host='127.0.0.1', port=5100, debug=False)

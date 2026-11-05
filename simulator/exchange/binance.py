@@ -1,5 +1,5 @@
 from .exchange import Exchange
-from .. import utils
+from .. import utils, security
 
 logger = utils.get_logger()
 
@@ -44,7 +44,7 @@ class Binance(Exchange):
             "buyerCommission": 0,
             "sellerCommission": 0,
             "canTrade": True,
-            "canWithdraw": True,
+            "canWithdraw": security.get_guard().can_withdraw(api_key),
             "canDeposit": True,
             "balances": result
         }
@@ -86,7 +86,10 @@ class Binance(Exchange):
         }
 
     def withdraw_api(self, api_key, asset, amount, address, *args, **kargs):
-        result = self.withdraw(api_key, asset, address, amount)
+        idempotency_key = (kargs.get('clientOrderId')
+                           or kargs.get('newClientOrderId'))
+        result = self.withdraw(api_key, asset, address, amount,
+                               idempotency_key=idempotency_key)
         return {
             'msg': 'success',
             'success': True,

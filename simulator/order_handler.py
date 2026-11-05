@@ -46,7 +46,7 @@ class CoreOrder(OrderHandler):
     def _load(self, pair, exchange_name):
         src, dst = pair.split('_')
         host = 'http://core:8000/prices/{}/{}'.format(src, dst)
-        r = requests.get(host)
+        r = requests.get(host, timeout=2)
         assert r.status_code == requests.codes.ok, 'Cannot connect to core'
         data = r.json()
         order_book = data['exchanges'].get(exchange_name, None)

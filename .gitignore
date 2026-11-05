@@ -3,3 +3,18 @@ simulator.log*
 data/
 *.pyc
 .DS_Store
+.venv/
+.pytest_cache/
+
+.env
+.env.*
+
+.opencode/
+
+# internal build/production notes (not part of the public demo)
+MASTER_PROMPT.md
+takes/
+reports/FOUR_MODEL_VIDEO_PLAN.md
+reports/MODEL_NAMING_PLAN.md
+reports/TERMINAL_RECORDING_PLAN.md
+reports/PROFESSIONAL_VIDEO_PLAN.md

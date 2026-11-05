@@ -1,11 +1,14 @@
+import json
+import os
 import unittest
 from unittest.mock import patch
-import json
 
 from simulator.exchange import Exchange
 from simulator.balance_handler import BalanceHandler
 from simulator.order_handler import CoreOrder
 from simulator import config, utils
+
+DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data')
 
 
 class TestExchange(unittest.TestCase):
@@ -24,7 +27,8 @@ class TestExchange(unittest.TestCase):
             cls.rdb,
             cls.orders,
             cls.balance,
-            config.LIQUI_ADDRESS
+            config.EXCHANGES_ADDRESS['binance'],
+            config.EXCHANGE_INFO['binance']
         )
 
     @classmethod
@@ -71,7 +75,8 @@ class TestExchange(unittest.TestCase):
             result = self.exchange.trade(**self.trade_params)
 
     def _mocked_order(*args, **kwargs):
-        with open('tests/data/mocked_order_knc_eth.json', 'r') as json_file:
+        path = os.path.join(DATA_DIR, 'mocked_order_knc_eth.json')
+        with open(path, 'r') as json_file:
             order_book = json.loads(json_file.read())
         return order_book
 

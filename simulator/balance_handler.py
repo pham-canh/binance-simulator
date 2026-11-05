@@ -24,7 +24,9 @@ class BalanceHandler:
                 raise ValueError('Invalid token: {}'.format(token))
 
             amount = float(amount)
-            assert amount >= 0, 'Invalid amount: {}'.format([amount, token])
+            if not (amount >= 0):
+                raise ValueError(
+                    'Invalid amount: {}'.format([amount, token]))
 
             return func(self, user, token, amount, balance_type)
         return wrapper

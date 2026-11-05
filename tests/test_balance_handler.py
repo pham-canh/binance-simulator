@@ -33,7 +33,7 @@ class TestBalance((unittest.TestCase)):
         self.assertEqual(after, before + amount)
 
     def test_deposit_negative_amount(self):
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             self.balance.deposit(self.user, 'knc', -10, 'available')
 
     def test_deposit_not_supported_token(self):
@@ -73,7 +73,7 @@ class TestBalance((unittest.TestCase)):
         self.assertEqual(after, before - amount)
 
     def test_withdraw_negative_amount(self):
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             self.balance.withdraw(self.user, 'knc', -10, 'available')
 
     def test_withdraw_not_supported_token(self):

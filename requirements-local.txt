@@ -1,0 +1,7 @@
+# Local Phase 1 stack: Python 3.12, no Docker, no real chain.
+Flask>=3,<4
+PyYAML>=6,<7
+fakeredis>=2,<3
+pytest>=8,<9
+redis>=5,<6
+requests>=2.31,<3

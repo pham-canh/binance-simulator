@@ -23,8 +23,35 @@ def bittrex_fmt_time(t):
     return dt.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
 
 
+_FAKE_SERVER = None
+
+
 def get_redis_db(db_no=0):
-    return redis.Redis(host='redis', port=6379, db=db_no, decode_responses=True)
+    """Return the shared Redis handle for this process.
+
+    ``SIMULATOR_REDIS=fake`` keeps the whole demo in process with fakeredis,
+    so tests and the recorded demo need no Docker service. Anything else uses
+    a real Redis reachable through ``REDIS_HOST``/``REDIS_PORT``.
+    """
+    mode = os.environ.get('SIMULATOR_REDIS', 'real').lower()
+    if mode in ('fake', 'fakeredis', 'inproc'):
+        global _FAKE_SERVER
+        try:
+            import fakeredis
+        except ImportError as e:
+            raise RuntimeError(
+                'SIMULATOR_REDIS=fake requires the fakeredis package') from e
+        if _FAKE_SERVER is None:
+            _FAKE_SERVER = fakeredis.FakeServer()
+        return fakeredis.FakeRedis(
+            server=_FAKE_SERVER, db=db_no, decode_responses=True)
+
+    return redis.Redis(
+        host=os.environ.get('REDIS_HOST', 'localhost'),
+        port=int(os.environ.get('REDIS_PORT', '6379')),
+        db=db_no,
+        decode_responses=True,
+        socket_connect_timeout=2)
 
 
 def normalize_timestamp(t):
@@ -53,17 +80,24 @@ def get_real_timestamp():
     return int(time.time() * 1000)
 
 
-def get_timestamp(data={}):
-    if config.MODE == 'simulation':
+def get_timestamp(data=None):
+    fixed = os.environ.get('SIMULATOR_CLOCK')
+    if fixed:
+        return int(fixed)
+
+    offline = os.environ.get('SIMULATOR_OFFLINE', '').lower() in (
+        '1', 'true', 'yes')
+    if config.MODE == 'simulation' and not offline:
         try:
-            r = requests.get('http://scheduler:7000/get')
+            r = requests.get('http://scheduler:7000/get', timeout=2)
             data = r.json()
             timestamp = data['timestamp']
         except Exception as e:
             logger.error("Can't get timestamp from scheduler: {}".format(e))
             timestamp = int(time.time() * 1000)
     else:
-        timestamp = data.get('timestamp', int(time.time()) * 1000)
+        timestamp = (data or {}).get(
+            'timestamp', int(time.time()) * 1000)
     return timestamp
 
 
@@ -85,7 +119,7 @@ def setup_data(rdb, ob_file):
             copy_order_books_to_db(ob_file, rdb)
         except FileNotFoundError:
             sys.exit('Data is missing.')
-        rdb.set(FLAG, True)
+        rdb.set(FLAG, '1')
         logger.info('Done.')
 
 
@@ -152,13 +186,17 @@ def convert_ob_json_file(ob_json_file, new_file):
 
 
 def get_pending_tnx(exchange):
+    if os.environ.get('SIMULATOR_OFFLINE', '').lower() in (
+            '1', 'true', 'yes'):
+        return {}
+
     url = 'http://core:8000/immediate-pending-activities'
     params = {'nonce': get_real_timestamp()}
     paybytes = urllib.parse.urlencode(params).encode('utf8')
     headers = {
         'signed': hmac.new(config.SECRET, paybytes, hashlib.sha512).hexdigest()
     }
-    r = requests.get(url, headers=headers, params=params)
+    r = requests.get(url, headers=headers, params=params, timeout=2)
     data = r.json()
 
     logger.info('Pending response: {}'.format(data))

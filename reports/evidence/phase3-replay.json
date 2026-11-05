@@ -1,0 +1,250 @@
+{
+  "title": "Binance Security Incident Simulator \u2014 Educational Replay",
+  "claim_boundary": "Independent educational simulator. Synthetic data only. Not affiliated with Binance. The scenario is an analogue at the withdrawal-control boundary, not a reproduction of the real intrusion chain.",
+  "seed": "binance-incident-demo",
+  "public_facts": [
+    {
+      "date": "2026-10-29 20:05 UTC",
+      "fact": "Binance hot wallets were compromised; approximately $6.3B of token assets were affected.",
+      "source": "Binance Support, Security Incident Update #2 (2026-10-30)"
+    },
+    {
+      "date": "2026-10-30",
+      "fact": "Withdrawals were suspended; roughly $3B was frozen on-chain; Binance said it found no evidence that wallet private keys were leaked.",
+      "source": "Binance Support, Security Incident Update #2 (2026-10-30)"
+    },
+    {
+      "date": "2026-11-03",
+      "fact": "Initial findings pointed to unauthorized access to an internal wallet signing service and malicious EIP-7702 authorizations; $6.34B impacted and $2.85B frozen.",
+      "source": "Binance, 29 October 2026 Incident: Initial Findings"
+    },
+    {
+      "date": "2026-10-29 23:56 UTC",
+      "fact": "The final unauthorized transfer of 2,961.9 ETH was finalized on-chain.",
+      "source": "Binance, 29 October 2026 Incident: Initial Findings"
+    },
+    {
+      "date": "2026-10-30 00:10 UTC",
+      "fact": "Binance cleared the EIP-7702 delegation code from the Binance14 hot wallet.",
+      "source": "Binance, 29 October 2026 Incident: Initial Findings"
+    }
+  ],
+  "events": [
+    {
+      "seq": 1,
+      "classification": "PUBLIC FACT",
+      "event": "reported-incident",
+      "date": "2026-10-29 20:05 UTC",
+      "fact": "Binance hot wallets were compromised; approximately $6.3B of token assets were affected.",
+      "source": "Binance Support, Security Incident Update #2 (2026-10-30)"
+    },
+    {
+      "seq": 2,
+      "classification": "PUBLIC FACT",
+      "event": "reported-incident",
+      "date": "2026-10-30",
+      "fact": "Withdrawals were suspended; roughly $3B was frozen on-chain; Binance said it found no evidence that wallet private keys were leaked.",
+      "source": "Binance Support, Security Incident Update #2 (2026-10-30)"
+    },
+    {
+      "seq": 3,
+      "classification": "PUBLIC FACT",
+      "event": "reported-incident",
+      "date": "2026-11-03",
+      "fact": "Initial findings pointed to unauthorized access to an internal wallet signing service and malicious EIP-7702 authorizations; $6.34B impacted and $2.85B frozen.",
+      "source": "Binance, 29 October 2026 Incident: Initial Findings"
+    },
+    {
+      "seq": 4,
+      "classification": "PUBLIC FACT",
+      "event": "reported-incident",
+      "date": "2026-10-29 23:56 UTC",
+      "fact": "The final unauthorized transfer of 2,961.9 ETH was finalized on-chain.",
+      "source": "Binance, 29 October 2026 Incident: Initial Findings"
+    },
+    {
+      "seq": 5,
+      "classification": "PUBLIC FACT",
+      "event": "reported-incident",
+      "date": "2026-10-30 00:10 UTC",
+      "fact": "Binance cleared the EIP-7702 delegation code from the Binance14 hot wallet.",
+      "source": "Binance, 29 October 2026 Incident: Initial Findings"
+    },
+    {
+      "seq": 6,
+      "classification": "SCENARIO",
+      "event": "synthetic-network-topology",
+      "detail": "Three deterministic in-process ledgers are seeded; no chain node or wallet is involved.",
+      "networks": {
+        "ethereum": {
+          "simulated": true,
+          "hot_wallet_buckets": 1,
+          "token_buckets": 13,
+          "broadcasts": 0
+        },
+        "bsc": {
+          "simulated": true,
+          "hot_wallet_buckets": 1,
+          "token_buckets": 13,
+          "broadcasts": 0
+        },
+        "tron": {
+          "simulated": true,
+          "hot_wallet_buckets": 1,
+          "token_buckets": 13,
+          "broadcasts": 0
+        }
+      }
+    },
+    {
+      "seq": 7,
+      "classification": "SCENARIO",
+      "event": "synthetic-operator-balance",
+      "user": "ops-demo",
+      "asset": "OMG",
+      "available": 1000.0,
+      "detail": "Synthetic operations account with withdrawal permission."
+    },
+    {
+      "seq": 8,
+      "classification": "SCENARIO",
+      "event": "compromised-authorization-grant",
+      "user": "ops-demo",
+      "scope": "withdraw",
+      "detail": "A stolen synthetic API key is used. The replay models only the authorization boundary; it does not model phishing, endpoint compromise, or the real signing service."
+    },
+    {
+      "seq": 9,
+      "classification": "CONTROL",
+      "event": "over-limit-withdrawal-rejected",
+      "asset": "OMG",
+      "requested": 999999.0,
+      "address": "0x00000000000000000000000000000000000000bb",
+      "error": {
+        "type": "SecurityError",
+        "code": -9003,
+        "message": "amount 999999.0 exceeds single-withdrawal limit 500.0 for OMG"
+      },
+      "balance_before": 1000.0,
+      "balance_after": 1000.0,
+      "broadcasts_before": 0,
+      "broadcasts_after": 0,
+      "detail": "The API rejects the request, the balance is unchanged, and the simulated chain receives no transaction."
+    },
+    {
+      "seq": 10,
+      "classification": "SCENARIO",
+      "event": "suspicious-withdrawal-allowed-with-alert",
+      "asset": "OMG",
+      "amount": 400.0,
+      "address": "0x00000000000000000000000000000000000000bb",
+      "tx": "0x4bb8d0694184827d47e1720716c665f8255b19c42132e850b6fb67a7dbf31b0f",
+      "broadcast_count": 1,
+      "detail": "New address above the alert threshold raises an anomaly but stays below the hard block threshold."
+    },
+    {
+      "seq": 11,
+      "classification": "CONTROL",
+      "event": "emergency-withdrawal-pause",
+      "reason": "suspicious withdrawal to a new address"
+    },
+    {
+      "seq": 12,
+      "classification": "CONTROL",
+      "event": "paused-withdrawal-rejected",
+      "asset": "OMG",
+      "requested": 400.0,
+      "address": "0x00000000000000000000000000000000000000bb",
+      "error": {
+        "type": "SecurityError",
+        "code": -9001,
+        "message": "withdrawals are paused: suspicious withdrawal to a new address"
+      },
+      "broadcasts_before": 1,
+      "broadcasts_after": 1,
+      "detail": "The pause blocks further movement while the responder investigates."
+    },
+    {
+      "seq": 13,
+      "classification": "CONTROL",
+      "event": "permission-revoked",
+      "user": "ops-demo",
+      "reason": "compromised credential"
+    },
+    {
+      "seq": 14,
+      "classification": "CONTROL",
+      "event": "revoked-withdrawal-rejected",
+      "asset": "OMG",
+      "requested": 1.0,
+      "address": "0x00000000000000000000000000000000000000aa",
+      "error": {
+        "type": "SecurityError",
+        "code": -9002,
+        "message": "withdraw permission has been revoked"
+      },
+      "detail": "Even a small withdrawal to a trusted address is rejected while the permission is revoked."
+    },
+    {
+      "seq": 15,
+      "classification": "CONTROL",
+      "event": "operator-restored",
+      "user": "ops-demo",
+      "detail": "The synthetic permission is restored after the drill."
+    },
+    {
+      "seq": 16,
+      "classification": "EVIDENCE",
+      "event": "audit-chain",
+      "records": 11,
+      "valid": true,
+      "head": "b046d3c164017cadfc48a0aa6bc10a397b42486ae48c7c072f783d756223702e",
+      "detail": "SHA-256 hash-chained audit records cover every allow/deny decision."
+    }
+  ],
+  "final": {
+    "operator_balance_omg": 600.0,
+    "chain_broadcasts": 1,
+    "sandbox_chain": {
+      "seed": "binance-incident-demo",
+      "hot_wallet": {
+        "956320540153841085873826116828291659258912826898": {
+          "1364068194842176056990105843868530818345537040110": 1000000000000000000000000000000,
+          "657115198601515882194541495624861098560364192945": 999999999600000000000000000000,
+          "1032069922050249630382865877677304880282300743300": 1000000000000000000000,
+          "564267341393795643152352908357442781466337883793": 100000000000000000000,
+          "1359924627288042178005626370225265450504721723937": 100000000000000000000,
+          "708794148849199719027776280888423651460573301061": 100000000000000000000,
+          "362650598983573880973118830413129184429781945916": 1000000000000000000000000000000,
+          "1221374290944429492397115729828423518166872595957": 10000000000000000,
+          "417675203185245391656064283446233439787158661214": 1000000000000000000000000000000,
+          "59339458879612172363125666098605078709011743746": 1000000000000000000000000000000,
+          "352898689026883544308082596877086151916568033202": 1000000000000000000000000000000,
+          "221419971573447240630009569563564675384115491047": 1000000000000000000000000000000,
+          "401908048980740052083961472925330886807729928046": 1000000000000000000000000000000
+        }
+      },
+      "pending_deposits": {},
+      "broadcasts": [
+        {
+          "tx": "0x4bb8d0694184827d47e1720716c665f8255b19c42132e850b6fb67a7dbf31b0f",
+          "kind": "withdraw",
+          "source": "956320540153841085873826116828291659258912826898",
+          "token": "657115198601515882194541495624861098560364192945",
+          "amount": 400000000000000000000,
+          "destination": "0x00000000000000000000000000000000000000bb",
+          "status": "confirmed"
+        }
+      ],
+      "transaction_count": 1
+    },
+    "guard": {
+      "paused": false,
+      "pause_reason": null,
+      "paused_users": {},
+      "revoked": [],
+      "audit_records": 11,
+      "audit_chain_valid": true
+    }
+  }
+}

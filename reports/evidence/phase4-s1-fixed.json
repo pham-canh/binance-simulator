@@ -1,0 +1,14 @@
+{
+  "scenario": "over-limit withdrawal",
+  "api_response": {
+    "code": -1,
+    "msg": "amount 999999.0 exceeds single-withdrawal limit 500.0 for OMG"
+  },
+  "balance_before": 10.0,
+  "balance_after": 10.0,
+  "broadcasts_before": 0,
+  "broadcasts_after": 0,
+  "ordering_bug_present": false,
+  "result": "BLOCKED \u2014 the request was rejected before any broadcast and the balance is unchanged",
+  "broadcast": null
+}

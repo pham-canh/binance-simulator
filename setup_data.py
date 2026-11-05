@@ -33,7 +33,7 @@ def init_balance():
             key = config.API_KEY[ex]
             for token, amount in balance.items():
                 balance_handler.deposit(key, token, amount, 'available')
-        rdb.set('INITIALIZED_BALANCES', True)
+        rdb.set('INITIALIZED_BALANCES', '1')
 
 
 if __name__ == '__main__':

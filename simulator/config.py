@@ -26,18 +26,28 @@ def get_int(hex_str):
     return int(hex_str, 16)
 
 
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONFIG_PATH = os.environ.get(
+    'SIMULATOR_CONFIG', os.path.join(REPO_ROOT, 'config.yml'))
+
 MODE = os.environ.get('KYBER_ENV', 'dev')
 try:
-    with open('config.yml', 'r') as f:
-        cfg = yaml.load(f)
+    with open(CONFIG_PATH, 'r') as f:
+        cfg = yaml.safe_load(f)
 
         logging.config.dictConfig(cfg['logging'])
 
-        DELAY = cfg[MODE]['delay']
-        BLOCKCHAIN_URL = cfg[MODE]['blockchain_url']
+        DELAY = int(os.environ.get(
+            'SIMULATOR_DELAY_MS', cfg[MODE]['delay']))
+        BLOCKCHAIN_URL = os.environ.get(
+            'SIMULATOR_BLOCKCHAIN_URL', cfg[MODE]['blockchain_url'])
+
+        addresses_path = cfg[MODE]['addresses']
+        if not os.path.isabs(addresses_path):
+            addresses_path = os.path.join(REPO_ROOT, addresses_path)
 
         try:
-            with open(cfg[MODE]['addresses'], 'r') as f:
+            with open(addresses_path, 'r') as f:
                 addr = json.loads(f.read())
 
                 EXCHANGES_ADDRESS = addr['exchangesAddress']
@@ -58,27 +68,29 @@ except FileNotFoundError:
     sys.exit('Config file is missing.')
 
 EXCHANGE_INFO = {}
-with open('info/binance.json', 'r') as f:
+with open(os.path.join(REPO_ROOT, 'info/binance.json'), 'r') as f:
     EXCHANGE_INFO['binance'] = json.loads(f.read())
-with open('info/bittrex.json', 'r') as f:
+with open(os.path.join(REPO_ROOT, 'info/bittrex.json'), 'r') as f:
     EXCHANGE_INFO['bittrex'] = json.loads(f.read())
 
-SECRET = b'vtHpz1l0kxLyGc4R1qJBkFlQre5352xGJU9h8UQTwUTz5p6VrxcEslF4KnDI21s1'
+# Synthetic placeholders. They are never used to sign a real request, are
+# not valid credential formats, and must not be replaced with real keys.
+SECRET = b'synthetic-hmac-secret-for-local-simulation-only'
 LOGGER_NAME = "simulator"
 EXCHANGE_NAME = "liqui"
 
 API_KEY = {
-    'liqui': 's7kwmscu-u6myvpjh-47evo234-y2uxw61t-raxby17f',
-    'binance': '3wixkht774mwnwrufv9ccsxocdawro3aiokxx77bjbkglc10ee2nhv4kys7jc07c',
-    'bittrex': '665ab1c6a04d4e4b855bd13639520c0a'
+    'liqui': 'synthetic-api-key-liqui',
+    'binance': 'synthetic-api-key-binance',
+    'bittrex': 'synthetic-api-key-bittrex'
 }
 
 PRIVATE_KEY = {
-    'bittrex': '7e72df544ce569ccd35b53a2e8411aaefebad8bb42b2ef443593663b1979ac9b',
-    'liqui': '96cc6fb5cd1266f36d3c180bce8c5e4c34bd7577cad6a21fa4d59fb8589d8c28',
-    'poloniex': '628fee3875f87594b24c773ca410c5e5e25ad142bf2eef5ea9fc56018064fbad',
-    'binance': 'cf0994187eedbeb765dd931372b75d542fd121577911486605352b32c1764b1e',
-    'bitfinex': 'be0a3d742ee009b1cc7e69abcaa4dc9a5960a4bcbe0c55a11b1333826bcc13cc'
+    'bittrex': 'synthetic-private-key-bittrex',
+    'liqui': 'synthetic-private-key-liqui',
+    'poloniex': 'synthetic-private-key-poloniex',
+    'binance': 'synthetic-private-key-binance',
+    'bitfinex': 'synthetic-private-key-bitfinex'
 }
 
 INITIAL_BALANCE = {

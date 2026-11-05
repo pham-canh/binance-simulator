@@ -2,7 +2,7 @@
 import time
 import traceback
 
-from .. import web3_interface, utils, config
+from .. import web3_interface, utils, config, security
 from ..order import Order
 
 
@@ -231,23 +231,63 @@ class Exchange:
             if total_qty < 1e-10:
                 break
 
-    def withdraw(self, api_key, coinName, address, amount):
+    def withdraw(self, api_key, coinName, address, amount,
+                 idempotency_key=None):
+        """Authorize, debit the internal balance, then broadcast.
+
+        The original implementation broadcast first and debited afterwards.
+        That ordering let a rejected withdrawal move funds on the simulated
+        chain (S1). The debit is now the gate: if it fails, nothing is
+        broadcast. A chain failure after the debit is refunded in-process.
+        """
         coinName = coinName.lower()
         amount = float(amount)
         token = utils.get_token(coinName)
-        tx = web3_interface.withdraw(self.private_key,
-                                     self.deposit_address,
-                                     token.address,
-                                     int(amount * 10**token.decimals),
-                                     address)
-        self.balance.withdraw(user=api_key, token=coinName,
-                              amount=amount, balance_type='available')
-        act = self.balance.add_activity('withdraw',
-                                        amount,
-                                        address,
-                                        tx,
-                                        token.token)
-        return act
+        guard = security.get_guard()
+
+        with guard.withdrawal_lock(api_key):
+            prior = guard.lookup(api_key, coinName, idempotency_key)
+            if prior is not None:
+                guard.record('withdraw.idempotent_replay', user=api_key,
+                             asset=coinName, amount=amount, address=address,
+                             idempotency_key=str(idempotency_key))
+                return prior
+
+            guard.authorize(api_key, coinName, amount, address)
+
+            try:
+                self.balance.withdraw(user=api_key, token=coinName,
+                                      amount=amount, balance_type='available')
+            except ValueError as e:
+                guard.record('withdraw.denied', user=api_key, asset=coinName,
+                             amount=amount, address=address,
+                             reason='insufficient available balance')
+                raise e
+
+            try:
+                tx = web3_interface.withdraw(
+                    self.private_key,
+                    self.deposit_address,
+                    token.address,
+                    int(amount * 10**token.decimals),
+                    address)
+            except Exception as e:
+                # FakeChain validates before mutating, so this path is a
+                # pre-broadcast failure and the debit must be restored.
+                self.balance.deposit(api_key, coinName, amount, 'available')
+                guard.record('withdraw.refunded', user=api_key,
+                             asset=coinName, amount=amount, address=address,
+                             reason=str(e))
+                raise
+
+            act = self.balance.add_activity('withdraw',
+                                            amount,
+                                            address,
+                                            tx,
+                                            token.token)
+            guard.commit(api_key, coinName, amount, address,
+                         idempotency_key=idempotency_key, activity=act, tx=tx)
+            return act
 
 
 MAX_ORDER_ID = 2 ** 31

@@ -1,0 +1,42 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+______ WithdrawAtomicityTest.test_rejected_withdraw_does_not_touch_chain _______
+
+self = <tests.test_withdraw_atomicity.WithdrawAtomicityTest testMethod=test_rejected_withdraw_does_not_touch_chain>
+
+    def test_rejected_withdraw_does_not_touch_chain(self):
+        self.balance.deposit(USER, 'omg', 10.0, 'available')
+        before = self.chain.snapshot()['transaction_count']
+    
+        with self.assertRaises(ValueError):
+            self.exchange.withdraw(USER, 'omg', ADDRESS, 999999)
+    
+        after = self.chain.snapshot()
+>       self.assertEqual(before, after['transaction_count'])
+E       AssertionError: 0 != 1
+
+tests/test_withdraw_atomicity.py:63: AssertionError
+______ WithdrawAtomicityTest.test_withdraw_over_limit_must_not_broadcast _______
+
+self = <tests.test_withdraw_atomicity.WithdrawAtomicityTest testMethod=test_withdraw_over_limit_must_not_broadcast>
+
+    def test_withdraw_over_limit_must_not_broadcast(self):
+        self.balance.deposit(USER, 'omg', 10.0, 'available')
+        before_balance = self.balance.get(USER, 'available')['omg']
+        before_broadcasts = self.chain.broadcast_count()
+    
+        with self.assertRaises(ValueError):
+            self.exchange.withdraw(USER, 'omg', ADDRESS, 999999)
+    
+        after_balance = self.balance.get(USER, 'available')['omg']
+        after_broadcasts = self.chain.broadcast_count()
+    
+        self.assertEqual(before_balance, after_balance)
+>       self.assertEqual(before_broadcasts, after_broadcasts)
+E       AssertionError: 0 != 1
+
+tests/test_withdraw_atomicity.py:53: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_withdraw_atomicity.py::WithdrawAtomicityTest::test_rejected_withdraw_does_not_touch_chain
+FAILED tests/test_withdraw_atomicity.py::WithdrawAtomicityTest::test_withdraw_over_limit_must_not_broadcast
+2 failed in 0.60s

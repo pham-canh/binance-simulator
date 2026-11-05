@@ -1,8 +1,9 @@
+import json
 import logging
 import unittest
+from types import SimpleNamespace
 from unittest import mock
 from unittest.mock import patch
-import json
 
 from bittrex_api import api, balance_handler, rdb
 
@@ -12,8 +13,10 @@ class TestBittrexAPI(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         logging.disable(logging.CRITICAL)
-        balance_handler.deposit('bittrex_key', 'omg', 10, 'available')
-        balance_handler.deposit('bittrex_key', 'eth', 10, 'available')
+        rdb.delete('balance_bittrex_key_available',
+                   'balance_bittrex_key_lock')
+        balance_handler.deposit('bittrex_key', 'omg', 100, 'available')
+        balance_handler.deposit('bittrex_key', 'eth', 100, 'available')
         cls.app = api.test_client()
 
     @classmethod
@@ -124,7 +127,7 @@ class TestBittrexAPI(unittest.TestCase):
         self.assertTrue(result['success'])
 
     def _mock_withdraw(*args, **kargs):
-        return "tx_id"
+        return SimpleNamespace(uuid='test-withdraw-uuid')
 
     @mock.patch('simulator.exchange.Exchange.withdraw', _mock_withdraw)
     def test_withdraw(self):

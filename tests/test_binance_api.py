@@ -1,7 +1,8 @@
+import json
 import logging
 import unittest
+from types import SimpleNamespace
 from unittest import mock
-import json
 
 from binance_api import api, balance_handler, rdb
 
@@ -11,7 +12,9 @@ class TestBinanceAPI(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         logging.disable(logging.CRITICAL)
-        balance_handler.deposit('api_key', 'omg', 10, 'available')
+        rdb.delete('balance_api_key_available', 'balance_api_key_lock')
+        # Enough for the open-order and cancel-order tests in sequence.
+        balance_handler.deposit('api_key', 'omg', 100, 'available')
         cls.app = api.test_client()
         cls.headers = {
             "X-MBX-APIKEY": "api_key"
@@ -100,7 +103,7 @@ class TestBinanceAPI(unittest.TestCase):
         self.assertIn('orderId', result)
 
     def _mock_withdraw(*args, **kargs):
-        return "tx_id"
+        return SimpleNamespace(uuid='test-withdraw-uuid')
 
     @mock.patch('simulator.exchange.Exchange.withdraw', _mock_withdraw)
     def test_withdraw(self):

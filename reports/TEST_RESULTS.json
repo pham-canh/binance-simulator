@@ -1,0 +1,81 @@
+{
+  "generated_at": "2026-11-05T06:57:29.553779+00:00",
+  "synthetic": true,
+  "overall": "ok",
+  "gates": [
+    {
+      "name": "pytest",
+      "ok": true,
+      "counts": {
+        "passed": 56,
+        "skipped": 14,
+        "xfailed": 5
+      },
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -o addopts='' -q"
+    },
+    {
+      "name": "live-api",
+      "ok": true,
+      "checks": 10,
+      "command": ".venv/bin/python scripts/verify_phase1.py"
+    },
+    {
+      "name": "incident-replay",
+      "ok": true,
+      "summary": {
+        "events": 16,
+        "public_facts": 5,
+        "operator_balance_omg": 600.0,
+        "broadcasts": 1,
+        "audit_valid": true,
+        "audit_records": 11,
+        "evidence": "reports/evidence/phase3-replay.json",
+        "audit_log": "reports/AUDIT_LOG.jsonl"
+      },
+      "command": ".venv/bin/python scripts/replay_incident.py"
+    },
+    {
+      "name": "audit-file-chain",
+      "ok": true,
+      "records": 11,
+      "file": "reports/AUDIT_LOG.jsonl"
+    },
+    {
+      "name": "withdrawal-ordering",
+      "ok": true,
+      "result": {
+        "scenario": "over-limit withdrawal",
+        "api_response": {
+          "code": -1,
+          "msg": "amount 999999.0 exceeds single-withdrawal limit 500.0 for OMG"
+        },
+        "balance_before": 10.0,
+        "balance_after": 10.0,
+        "broadcasts_before": 0,
+        "broadcasts_after": 0,
+        "ordering_bug_present": false,
+        "result": "BLOCKED \u2014 the request was rejected before any broadcast and the balance is unchanged",
+        "broadcast": null
+      },
+      "command": ".venv/bin/python scripts/show_s1.py"
+    },
+    {
+      "name": "dashboard",
+      "ok": true,
+      "result": {
+        "page_status": 200,
+        "page_bytes": 10262,
+        "markers": [
+          "BINANCE SIMULATOR",
+          "INDEPENDENT EDUCATIONAL SIMULATOR",
+          "NOT BINANCE",
+          "SYNTHETIC ENVIRONMENT"
+        ],
+        "display_name": "BINANCE SIMULATOR",
+        "synthetic": true,
+        "audit_chain_valid": true
+      },
+      "command": ".venv/bin/python scripts/check_dashboard.py"
+    }
+  ]
+}

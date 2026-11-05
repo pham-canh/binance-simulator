@@ -1,0 +1,21 @@
+{
+  "scenario": "over-limit withdrawal with S1 present",
+  "api_response": {
+    "code": -1,
+    "msg": "not enough 999999.0 omg in available balance"
+  },
+  "balance_before": 10.0,
+  "balance_after": 10.0,
+  "broadcasts_before": 0,
+  "broadcasts_after": 1,
+  "bug": "the API rejected the debit, but a withdrawal transaction was already broadcast to the simulated chain",
+  "broadcast": {
+    "tx": "0x6e0b8ee88384329b78a5b6b9ff9673143368c38799154031c9665a7e77aafa19",
+    "kind": "withdraw",
+    "source": "956320540153841085873826116828291659258912826898",
+    "token": "657115198601515882194541495624861098560364192945",
+    "amount": 999998999999999972999168,
+    "destination": "0xc7159686de47f2ca06fcd1e74d1b9a1a0e584259",
+    "status": "confirmed"
+  }
+}

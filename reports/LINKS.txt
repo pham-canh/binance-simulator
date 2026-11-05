@@ -1,0 +1,25 @@
+BINANCE SECURITY INCIDENT SIMULATOR
+Independent educational demo - not Binance.
+
+RESULT
+  56 passed, 14 skipped, 5 xfailed
+  10/10 live API checks
+  rejected withdrawal: 0 broadcasts, balance unchanged
+  audit chain: valid
+
+OPENCODE-HARNESS-KIT v0.9.0
+  Model-agnostic harness: use <provider>/<model> --retention <level>
+  Compiles a profile to OpenCode config, lane agents, prompts, skills, GLOBAL.md
+  Free, paid or local models; catalogue resolve + lock for offline runs
+  Lifecycle: list, show, refresh, research, doctor, health
+  Workflow: spec -> design -> decompose -> work/plan -> verify/review/fix -> finish
+  Automation: autopilot, worktree/branch/commit, resume, status, report
+  Safety: Docker verify, token/session/time budgets, tool guards, backup/restore
+  Ops: baseline, cost, lanes, eval A/B, doctor --watch, read-only MCP
+
+LINKS
+  LinkedIn  https://www.linkedin.com/in/canh-pham-bot-dev
+  GitHub    https://github.com/pham-canh
+  Kit       https://github.com/pham-canh/opencode-harness-kit
+
+Synthetic data. No real funds. No chain calls.
